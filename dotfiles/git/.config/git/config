@@ -22,6 +22,7 @@
 [delta]
 	navigate = true
 	line-numbers = true
+	diff-so-fancy = true
 [diff]
 	colorMoved = default
 	external = difft
