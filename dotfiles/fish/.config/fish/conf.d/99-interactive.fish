@@ -9,6 +9,7 @@ if status is-interactive
     alias rs='rsync -ahP --info=progress2'
     alias yes='no'
     alias nssh='ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
+    alias nscp='scp -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
 
     alias tb='ncat termbin.com 9999'
 
