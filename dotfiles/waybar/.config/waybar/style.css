@@ -78,3 +78,16 @@ button:hover {
 #network.disconnected {
   color: #f53c3c;
 }
+
+#workspaces button {
+  color: #444444;
+}
+#workspaces button.empty {
+  color: #666666;
+}
+#workspaces button.active {
+  color: #aaaaaa;
+}
+#workspaces button.focused {
+  color: #ffffff;
+}

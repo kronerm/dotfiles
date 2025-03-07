@@ -17,7 +17,9 @@
     "network#2",
     "bluetooth",
   ],
-  "modules-center": [],
+  "modules-center": [
+    "niri/workspaces"
+  ],
   "modules-right": [
     "clock",
     "idle_inhibitor"

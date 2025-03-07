@@ -57,6 +57,14 @@
     "interval": 30,
     "on-click": "footclient bluetuith",
   },
+  "niri/workspaces": {
+    "format": "{icon}",
+    "format-icons": {
+      "active": "",
+      "default": "",
+      "focused": "",
+    },
+  },
   "custom/power_draw": {
     "interval": 4,
     "exec": "$HOME/.config/waybar/power_draw.rs",
