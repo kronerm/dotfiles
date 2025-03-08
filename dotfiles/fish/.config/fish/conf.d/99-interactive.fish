@@ -3,6 +3,7 @@ if status is-interactive
     alias df="df -h"
     alias ip='ip -c'
     alias ls='eza --all --long --links --group-directories-first'
+    alias lt='eza --long --links --tree --level=2'
     alias mv='mv -i'
     alias rm='rm -I'
     alias vim='nvim'
