@@ -82,3 +82,6 @@ set -x ANKI_WAYLAND 1
 
 # disable cows in ansible
 set -x ANSIBLE_NOCOWS 1
+
+# force sdl wayland
+set -x SDL_VIDEODRIVER wayland
