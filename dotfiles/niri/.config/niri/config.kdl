@@ -86,12 +86,12 @@ output "eDP-1" {
     position x=0 y=0
 }
 output "LG Electronics LG ULTRAFINE 312NTZNBQ917" {
-    mode "3840x2160@144.050"
+    mode "3840x2160@120.00"
     scale 1.25
     position x=-3072 y=0
 }
 output "PNP(AOC) Q32G1WG4 0x00000203" {
-    mode "2560x1440@59.951"
+    mode "2560x1440@119.998"
     scale 1.0
     position x=1920 y=-560
 }
