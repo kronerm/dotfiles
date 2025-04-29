@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
-GAMESCOPE="gamescope -b $(cat /sys/class/drm/*/modes | sort -h | uniq | rofi -dmenu | sed -E 's/^/-W /;s/x/ -H /') -r $(printf '30\n60\n72\n90\n120\n144\n165\n240' | rofi -dmenu) --"
-[ "$USE_GAMESCOPE" -eq 0 ] && GAMESCOPE=""
+set -Eeuo pipefail
 
-$GAMESCOPE "${@:1}"
+gamescope=""
+
+if [ "${GAMESCOPE_DISABLED:-"0"}" != "1" ]; then
+  available_modes_with_refresh_rates_json="$(wlr-randr --json | jq '[.[].modes[]] | group_by(.width, .height) | map({"\(.[0].width)x\(.[0].height)": map(.refresh)}) | add')"
+  selected_display_resolution="$(echo -e "$available_modes_with_refresh_rates_json" | jq -r 'keys[]' | sort -h | rofi -dmenu)"
+  selected_display_refresh_rate="$(echo -e "$available_modes_with_refresh_rates_json" | jq -r ".\"$selected_display_resolution\"[]" | sort -h | rofi -dmenu)"
+
+  selected_display_resolution_width="$(echo "$selected_display_resolution" | cut -d'x' -f1)"
+  selected_display_resolution_height="$(echo "$selected_display_resolution" | cut -d'x' -f2)"
+
+  gamescope="gamescope -b -W $selected_display_resolution_width -H $selected_display_resolution_height -r $selected_display_refresh_rate --"
+fi
+
+$gamescope "${@:1}"
