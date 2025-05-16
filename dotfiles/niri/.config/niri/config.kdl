@@ -311,7 +311,7 @@ binds {
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return { spawn "footclient"; }
     Mod+Space { spawn "rofi" "-disable-history" "-show" "run"; }
-    Mod+W { spawn "librewolf"; }
+    Mod+W { spawn "brave"; }
     Super+Alt+L { spawn "hyprlock"; }
 
     // You can also use a shell:
