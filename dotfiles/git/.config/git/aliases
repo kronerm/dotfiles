@@ -5,8 +5,11 @@
   cm = c -m
   co = checkout
   d = diff
+  dd = -c diff.external=difft d
   ds = diff --staged
+  dds = -c diff.external=difft ds
   l = log
+  dl = -c diff.external=difft l
   ll = l --graph --pretty=oneline --abbrev-commit
   lla = ll --all
   r = restore
