@@ -86,3 +86,5 @@ set -x ANSIBLE_NOCOWS 1
 
 # force sdl wayland
 set -x SDL_VIDEODRIVER wayland
+
+set -x OBSIDIAN_USE_WAYLAND 1
