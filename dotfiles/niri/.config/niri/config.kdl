@@ -27,6 +27,7 @@ input {
 }
 
 output "eDP-1" {
+    variable-refresh-rate
     mode "2880x1800@120.000"
     scale 1.5
     transform "normal"
