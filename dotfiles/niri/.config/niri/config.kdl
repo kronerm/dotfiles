@@ -79,6 +79,7 @@ spawn-at-startup "gammastep"
 spawn-at-startup "swaybg" "-i" ".dotfiles/.wallpapers/wallhaven-2ero7g.jpg"
 spawn-at-startup "waybar"
 spawn-at-startup "foot" "--server"
+spawn-at-startup "battery-check.sh"
 
 environment {
     DISPLAY ":0"
