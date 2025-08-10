@@ -67,11 +67,11 @@
   },
   "custom/power_draw": {
     "interval": 4,
-    "exec": "$HOME/.config/waybar/power_draw.rs",
+    "exec": "power_draw.rs",
     "format": "󱐌{} W  ",
   },
   "custom/power_profile": {
-    "exec": "$HOME/.config/waybar/watch_file.sh /sys/bus/platform/devices/tuxedo_platform_profile/platform_profile",
+    "exec": "watch_file.sh /sys/bus/platform/devices/tuxedo_platform_profile/platform_profile",
     "format": "󰓅 {}",
   },
   "idle_inhibitor": {
