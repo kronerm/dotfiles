@@ -1,0 +1,15 @@
+[package]
+name = "gamerunner"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.43", features = ["derive"] }
+color-eyre = "0.6.5"
+dwarfs = "0.2.1"
+eyre = "0.6.12"
+pathdiff = "0.2.3"
+sys-mount = "3.0.1"
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"
+which = "8.0.0"
