@@ -87,4 +87,7 @@ set -x ANSIBLE_NOCOWS 1
 # force sdl wayland
 set -x SDL_VIDEODRIVER wayland
 
+# fix ghidra and other java apps
+set -x _JAVA_AWT_WM_NONREPARENTING 1
+
 set -x OBSIDIAN_USE_WAYLAND 1
