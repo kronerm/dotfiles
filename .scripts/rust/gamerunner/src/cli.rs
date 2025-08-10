@@ -49,7 +49,8 @@ pub(crate) enum ProtonRunnable {
 }
 
 #[derive(Debug, Subcommand)]
-pub(crate) enum Platform {
+pub(crate) enum Run {
+    Mount,
     Native {
         path: PathBuf,
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
@@ -79,7 +80,7 @@ pub(crate) struct NonSteamGame {
     #[arg(long, default_value = ".")]
     pub(crate) relative_working_directory: PathBuf,
     #[command(subcommand)]
-    pub(crate) platform: Platform,
+    pub(crate) run: Run,
 }
 
 #[derive(Debug, Subcommand)]

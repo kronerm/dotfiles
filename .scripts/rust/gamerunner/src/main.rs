@@ -407,7 +407,7 @@ fn main() -> eyre::Result<()> {
 
     let args = cli::CliArgs::parse();
 
-    let wrapper =
+    let wrapper_opt =
         match args.game {
             cli::Game::NonSteam(non_steam_game) => {
                 let current_dir = env::current_dir()?;
@@ -419,26 +419,43 @@ fn main() -> eyre::Result<()> {
                     .clone()
                     .join(non_steam_game.relative_working_directory);
 
-                match non_steam_game.platform {
-                    cli::Platform::Native { path, args } => {
-                        run::RunWrapper::new(game_dir, &path, args, handle).without_proton()
+                match non_steam_game.run {
+                    cli::Run::Mount => {
+                        Command::new("/bin/bash")
+                            .args([
+                                "-c",
+                                "read -n1 -s -r -p 'Press any key to unmount and exit\n'",
+                            ])
+                            .status()?;
+                        None
                     }
-                    cli::Platform::Proton {
+                    cli::Run::Native { path, args } => {
+                        Some(run::RunWrapper::new(game_dir, &path, args, handle).without_proton())
+                    }
+                    cli::Run::Proton {
                         proton_path,
                         runnable,
                     } => match runnable {
-                        cli::ProtonRunnable::Command { command_path, args } => {
+                        cli::ProtonRunnable::Command { command_path, args } => Some(
                             run::RunWrapper::new(game_dir, &command_path, args, handle)
-                                .with_proton(&gamerunner_dir, &proton_path, false)?
-                        }
-                        cli::ProtonRunnable::ExeFile { exe, args } => run::RunWrapper::new(
-                            game_dir, &exe, args, handle,
-                        )
-                        .with_proton(&gamerunner_dir, &proton_path, true)?,
+                                .with_proton(&gamerunner_dir, &proton_path, false)?,
+                        ),
+                        cli::ProtonRunnable::ExeFile { exe, args } => Some(
+                            run::RunWrapper::new(game_dir, &exe, args, handle).with_proton(
+                                &gamerunner_dir,
+                                &proton_path,
+                                true,
+                            )?,
+                        ),
                     },
                 }
             }
         };
+
+    if wrapper_opt.is_none() {
+        return Ok(());
+    }
+    let wrapper = wrapper_opt.unwrap();
 
     let gamescope = false;
     let wrapper = if gamescope {
