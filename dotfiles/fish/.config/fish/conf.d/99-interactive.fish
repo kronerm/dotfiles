@@ -28,11 +28,12 @@ if status is-interactive
 
     function git-cleanup-branches
         git fetch -p &&
-            git branch -r |
+            git branch --merged |
+                grep -Ev '^[ +*] (master|main|develop|trunk)$' |
+                # ignore checked out branches
+                grep -Ev '^[+*] .*$' |
                 awk '{print $1}' |
-                grep -Evf /dev/fd/0 (git branch -vv | grep -F origin | psub) |
-                awk '{print $1}' |
-                xargs git branch -d
+                xargs -r -d'\n' git branch -d
     end
 
     set -x NMAP_PRIVILEGED
