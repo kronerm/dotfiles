@@ -1,5 +1,3 @@
--- if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
-
 -- AstroCommunity: import any community modules here
 -- We import this file in `lazy_setup.lua` before the `plugins/` folder.
 -- This guarantees that the specs are processed before any user plugins.
@@ -14,6 +12,7 @@ return {
   { import = "astrocommunity.pack.bash" },
   { import = "astrocommunity.pack.cpp" },
   { import = "astrocommunity.pack.fish" },
+  { import = "astrocommunity.pack.go" },
   { import = "astrocommunity.pack.html-css" },
   { import = "astrocommunity.pack.json" },
   { import = "astrocommunity.pack.kotlin" },
