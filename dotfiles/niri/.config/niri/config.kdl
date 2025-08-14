@@ -111,7 +111,7 @@ binds {
     Mod+Space { spawn "rofi" "-disable-history" "-show" "run"; }
     Mod+V { spawn "sh" "-c" "cliphist list | rofi -dmenu -display-columns 2 | cliphist decode | wl-copy"; }
     Mod+B { spawn "rofi-rbw"; }
-    Mod+W { spawn "brave"; }
+    Mod+W { spawn "zen-browser"; }
 
     XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.01+"; }
     XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.01-"; }
