@@ -8,6 +8,7 @@ use clap::Parser as _;
 use eyre::ContextCompat as _;
 
 mod cli;
+mod wlr_randr;
 
 mod run {
     use std::{
@@ -220,18 +221,29 @@ mod run {
                 envs: self.envs,
             }
         }
-        pub fn with_gamescope(self) -> RunWrapper<WithOrWithoutGamescope> {
-            RunWrapper {
+        pub fn with_gamescope(self) -> eyre::Result<RunWrapper<WithOrWithoutGamescope>> {
+            let desired_mode = crate::wlr_randr::get_desired_mode()?;
+            Ok(RunWrapper {
                 _phantom: PhantomData,
                 unmount_handle: self.unmount_handle,
                 cwd: self.cwd,
                 exe: "gamescope".to_string(),
                 args: [
                     "-b".to_string(),
+                    "-f".to_string(),
                     "-W".to_string(),
-                    "800".to_string(),
+                    desired_mode.width.to_string(),
                     "-H".to_string(),
-                    "600".to_string(),
+                    desired_mode.height.to_string(),
+                    "-r".to_string(),
+                    desired_mode.refresh_rate.to_string(),
+                    "--framerate-limit".to_string(),
+                    desired_mode.refresh_rate.to_string(),
+                    "--adaptive-sync".to_string(),
+                    "--force-grab-cursor".to_string(),
+                    "--scaler".to_string(),
+                    "stretch".to_string(),
+                    "--mangoapp".to_string(),
                     "--".to_string(),
                     self.exe,
                 ]
@@ -239,7 +251,7 @@ mod run {
                 .chain(self.args)
                 .collect(),
                 envs: self.envs,
-            }
+            })
         }
     }
 }
@@ -273,7 +285,22 @@ fn mount_dwarfs(archive: PathBuf, dir: PathBuf) -> eyre::Result<DwarfsMountHandl
     fs::create_dir_all(&dir)?;
     run_command(
         "dwarfs",
-        &[archive.to_str().unwrap(), dir.to_str().unwrap()],
+        &[
+            archive.to_str().unwrap(),
+            dir.to_str().unwrap(),
+            "-o",
+            "tidy_strategy=time",
+            "-o",
+            "tidy_interval=15m",
+            "-o",
+            "tidy_max_age=30m",
+            "-o",
+            "cachesize=4042437k",
+            "-o",
+            "clone_fd",
+            "-o",
+            "cache_image",
+        ],
     )?;
     tracing::info!("mounted dwarfs ({archive:?} -> {dir:?})");
     Ok(DwarfsMountHandle {
@@ -352,7 +379,7 @@ fn prepare_game_directory(
             //     eyre::bail!("exe not found inside dwarfs archive");
             // }
         } else {
-            std::os::unix::fs::symlink(source, &lower_dir_path)?;
+            std::os::unix::fs::symlink(fs::canonicalize(source)?, &lower_dir_path)?;
             lower_dirs.push((
                 Some(Box::new(SymlinkHandle {
                     link: lower_dir_path.clone(),
@@ -457,9 +484,8 @@ fn main() -> eyre::Result<()> {
     }
     let wrapper = wrapper_opt.unwrap();
 
-    let gamescope = false;
-    let wrapper = if gamescope {
-        wrapper.with_gamescope()
+    let wrapper = if args.use_gamescope {
+        wrapper.with_gamescope()?
     } else {
         wrapper.without_gamescope()
     };

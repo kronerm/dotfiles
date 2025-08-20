@@ -2,38 +2,6 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 
-pub(crate) mod gamescope {
-    use clap::{Args, ValueEnum};
-
-    #[derive(Clone, Debug, ValueEnum)]
-    pub(crate) enum Scaler {
-        Auto,
-        Integer,
-        Fit,
-        Fill,
-        Stretch,
-    }
-
-    #[derive(Debug, Args)]
-    pub(crate) struct Options {
-        /// gamescope: borderless
-        #[arg(short, long, default_value_t = false)]
-        borderless: bool,
-        /// gamescope: output width
-        #[arg(short = 'W', long, requires = "output_height")]
-        output_width: Option<usize>,
-        /// gamescope: output height
-        #[arg(short = 'H', long, requires = "output_width")]
-        output_height: Option<usize>,
-        /// gamescope: nested refresh
-        #[arg(short = 'r', long)]
-        nested_refresh: Option<usize>,
-        /// gamescope: scaler
-        #[arg(short = 'S', long, default_value = "auto")]
-        scaler: Scaler,
-    }
-}
-
 #[derive(Debug, Subcommand)]
 pub(crate) enum ProtonRunnable {
     Command {
@@ -90,8 +58,8 @@ pub(crate) enum Game {
 
 #[derive(Debug, Parser)]
 pub(crate) struct CliArgs {
-    #[command(flatten)]
-    pub(crate) gamescope_opts: gamescope::Options,
+    #[arg(long, default_value_t = false)]
+    pub(crate) use_gamescope: bool,
     #[command(subcommand)]
     pub(crate) game: Game,
 }
