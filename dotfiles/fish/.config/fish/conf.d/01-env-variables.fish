@@ -63,8 +63,6 @@ end
 append_path /usr/bin/vendor_perl
 prepend_path "$HOME/.dotnet/tools"
 prepend_path "$CARGO_HOME/bin"
-prepend_path "$HOME/.local/share/rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin"
-prepend_path "$HOME/.local/share/rustup/toolchains/nightly-x86_64-unknown-linux-gnu/bin"
 prepend_path "$HOME/.local/bin"
 prepend_path "$DOTFILES/.scripts"
 
