@@ -36,6 +36,10 @@ if status is-interactive
                 xargs -r -d'\n' git branch -d
     end
 
+    function get-domain-ips-global
+        dug run -t 5000 --output-format JSON --output-template value "$argv[1]" | jq -r '.[].value' | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | sort | uniq
+    end
+
     set -x NMAP_PRIVILEGED
 
     if command -v pazi &>/dev/null
