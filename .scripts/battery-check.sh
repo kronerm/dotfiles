@@ -6,7 +6,7 @@ while true; do
   battery_level="$(cat /sys/class/power_supply/BAT0/capacity)"
 
   [ "$battery_level" -lt 15 ] &&
-    notify-send -a "BATTERY LEVEL LOW" "$battery_level" \
+    notify-send -a "Battery level low" "$battery_level%" \
       -t 5000 \
       -e \
       --hint int:value:"$battery_level" \
