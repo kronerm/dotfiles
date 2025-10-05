@@ -70,8 +70,14 @@ return {
         settings = {
           ["rust-analyzer"] = {
             cargo = {
+              buildScripts = {
+                enable = true,
+              },
               extraEnv = { CARGO_PROFILE_RUST_ANALYZER_INHERITS = "dev" },
               extraArgs = { "--profile", "rust-analyzer" },
+            },
+            procMacro = {
+              enable = true,
             },
           },
         },
