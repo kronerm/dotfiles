@@ -352,6 +352,7 @@ dependencies = [
  "color-eyre",
  "dwarfs",
  "eyre",
+ "glob",
  "itertools 0.14.0",
  "pathdiff",
  "serde",

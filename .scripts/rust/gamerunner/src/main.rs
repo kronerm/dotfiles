@@ -1,3 +1,5 @@
+#![feature(trim_prefix_suffix)]
+
 use std::{
     env, fs,
     path::{Path, PathBuf},
@@ -19,6 +21,8 @@ mod run {
         path::{Path, PathBuf},
         process::{Command, ExitStatus, Stdio},
     };
+
+    use itertools::Itertools;
 
     /// gamescope -b ... -W ... -H ... -- proton run <exe>
     pub struct RunWrapper<T> {
@@ -179,6 +183,32 @@ mod run {
                                 "WINEPREFIX",
                                 fs::canonicalize(prefix_dir.join("pfx"))?.to_str().unwrap(),
                             ),
+                            (
+                                "LD_LIBRARY_PATH",
+                                &glob::glob(
+                                    "/home/kreny/.local/share/Steam/steamapps/common/SteamLinuxRuntime_sniper/var/tmp-*"
+                                )
+                                .unwrap()
+                                .filter_map(Result::ok)
+                                .sorted_by_key(
+                                    |p| fs::metadata(p).unwrap().modified().unwrap()
+                                )
+                                .rev()
+                                .map(
+                                    |p| [
+                                        Some("/usr/lib64".to_string()),
+                                        Some("/usr/lib32".to_string()),
+                                        Some(p.join("usr/lib/x86_64-linux-gnu").to_str().unwrap().to_string()),
+                                        Some(p.join("usr/lib/i386-linux-gnu").to_str().unwrap().to_string()),
+                                        env::var("LD_LIBRARY_PATH").ok()
+                                    ]
+                                    .into_iter()
+                                    .flatten()
+                                    .join(":")
+                                )
+                                .next()
+                                .unwrap()
+                            ),
                             ("HOME", fs::canonicalize(gamerunner_dir)?.to_str().unwrap()),
                             ("PATH", &{
                                 let proton_dir = proton_path.parent().unwrap();
@@ -256,13 +286,48 @@ mod run {
     }
 }
 
-fn run_command(cmd: &str, args: &[&str]) -> eyre::Result<i32> {
+fn run_command_zero_code(cmd: &str, args: &[&str]) -> eyre::Result<()> {
     Command::new(cmd)
         .args(args)
         .status()?
         .code()
         .filter(|&code| code == 0)
+        .map(|_| ())
         .context(format!("'{cmd} {}'", args.join(" ")))
+}
+
+fn umount_wait_busy(mountpoint: &str) {
+    while run_command_zero_code("umount", &[mountpoint]).is_err() {
+        let stdout = String::from_utf8(
+            Command::new("fuser")
+                .args(["-m", mountpoint])
+                .output()
+                .unwrap()
+                .stdout,
+        )
+        .unwrap();
+
+        let progs = stdout
+            .split_whitespace()
+            .map(|prog| prog.parse::<usize>().unwrap())
+            .collect::<Vec<_>>();
+
+        let progs = progs
+            .iter()
+            .map(|prog| {
+                let cmdline = std::fs::read(format!("/proc/{prog}/cmdline")).unwrap();
+                let cmdline = cmdline
+                    .split(|&b| b == 0)
+                    .filter(|part| !part.is_empty())
+                    .map(|part| String::from_utf8(part.to_vec()).unwrap())
+                    .collect::<Vec<_>>();
+                (prog, cmdline)
+            })
+            .collect::<Vec<_>>();
+
+        tracing::error!("{progs:#?}");
+        std::thread::sleep(std::time::Duration::from_secs(2));
+    }
 }
 
 trait Handle: std::fmt::Debug {}
@@ -275,7 +340,7 @@ struct DwarfsMountHandle {
 impl Drop for DwarfsMountHandle {
     fn drop(&mut self) {
         tracing::info!("unmounting dwarfs: {self:#?}");
-        run_command("umount", &[self.dir.to_str().unwrap()]).unwrap();
+        umount_wait_busy(self.dir.to_str().unwrap());
         fs::remove_dir(&self.dir).unwrap();
     }
 }
@@ -283,7 +348,7 @@ impl Handle for DwarfsMountHandle {}
 
 fn mount_dwarfs(archive: PathBuf, dir: PathBuf) -> eyre::Result<DwarfsMountHandle> {
     fs::create_dir_all(&dir)?;
-    run_command(
+    run_command_zero_code(
         "dwarfs",
         &[
             archive.to_str().unwrap(),
@@ -330,7 +395,7 @@ struct OverlayFsHandle {
 impl Drop for OverlayFsHandle {
     fn drop(&mut self) {
         tracing::info!("unmounting overlayfs: {self:#?}");
-        run_command("umount", &[self.merged_dir.to_str().unwrap()]).unwrap();
+        umount_wait_busy(self.merged_dir.to_str().unwrap());
 
         fs::remove_dir(&self.merged_dir).unwrap();
         fs::remove_dir(self.work_dir.join("work")).unwrap();
@@ -389,7 +454,7 @@ fn prepare_game_directory(
         }
     }
 
-    run_command(
+    run_command_zero_code(
         "fuse-overlayfs",
         &[
             "-o",
